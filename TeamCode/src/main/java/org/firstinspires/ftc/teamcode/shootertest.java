@@ -13,10 +13,7 @@ public class shootertest extends LinearOpMode {
     private static final double TICKS_PER_REV = 28.0;
     private static final double START_RPM = 500;
 
-    private static final double INDEX_POWER = 1;
-
     private DcMotorEx shooter1, shooter2;
-    private DcMotor Index;
     private double targetRpm = START_RPM;
 
     private boolean lastUp, lastDown, lastRb, lastLb;
@@ -26,17 +23,13 @@ public class shootertest extends LinearOpMode {
         shooter1 = hardwareMap.get(DcMotorEx.class, "shooter_left");
         shooter2 = hardwareMap.get(DcMotorEx.class, "shooter_right");
 
-        Index = hardwareMap.get(DcMotor.class, "Index");
-
         shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        Index.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Index.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         telemetry.update();
 
@@ -71,20 +64,14 @@ public class shootertest extends LinearOpMode {
                     && Math.abs(rpm1 - targetRpm) < 50
                     && Math.abs(rpm2 - targetRpm) < 50;
 
-
-            boolean feed = spin || gamepad2.left_bumper;
-            Index.setPower(feed ? INDEX_POWER : 0);
-
             telemetry.addData("TARGET RPM", "%.0f", targetRpm);
             telemetry.addData("shooter1", "%.0f", rpm1);
             telemetry.addData("shooter2", "%.0f", rpm2);
             telemetry.addData("at speed", atSpeed ? "YES" : "no");
-            telemetry.addData("indexer", feed ? "feeding" : "stopped");
             telemetry.update();
         }
 
         shooter1.setPower(0);
         shooter2.setPower(0);
-        Index.setPower(0);
     }
 }
