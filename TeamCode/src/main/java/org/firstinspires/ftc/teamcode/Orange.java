@@ -102,7 +102,6 @@ public class Orange extends OpMode {
 
     @Override
     public void init() {
-        // Bulk reads: encoder and digital-input reads in a loop share one hub transaction
         for (LynxModule hub : hardwareMap.getAll(LynxModule.class)) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
