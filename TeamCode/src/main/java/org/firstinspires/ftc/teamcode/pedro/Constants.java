@@ -1,10 +1,17 @@
 package org.firstinspires.ftc.teamcode.pedro;
 
+import com.pedropathing.algorithm.Foresight;
+import com.pedropathing.algorithm.ForesightConfig;
+import com.pedropathing.controllers.Controller;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.math.Matrix;
+import com.pedropathing.math.Vector2D;
+import com.pedropathing.revhub.drivetrains.Mecanum;
 import com.pedropathing.revhub.drivetrains.MecanumConfig;
 import com.pedropathing.revhub.localizers.Encoder;
 import com.pedropathing.revhub.localizers.RevHubIMU;
 import com.pedropathing.revhub.localizers.ThreeWheelIMUConfig;
+import com.pedropathing.revhub.localizers.ThreeWheelIMULocalizer;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -39,8 +46,39 @@ public class Constants {
         c.rightEncoderDirection.set(Encoder.FORWARD);
         c.strafeEncoderDirection.set(Encoder.REVERSE);
     });
+    // TODO PLACEHOLDER: these are rough starting guesses so the Follower can be built, NOT tuned values.
+    // Run the "Foresight Tuner" procedure in AutoTune (http://192.168.43.1:10158) on the robot and
+    // paste the generated foresightConfig over this whole block before trusting any path.
+    public static ForesightConfig foresightConfig = new ForesightConfig(
+            c -> {
+                Controller primaryTranslationalForward = Controller.proportional(0.1);
+                Controller secondaryTranslationalForward = Controller.proportional(0.02);
+                Controller primaryTranslationalLateral = Controller.proportional(0.1);
+                Controller secondaryTranslationalLateral = Controller.proportional(0.02);
+
+                c.forwardTranslational.set(Controller.piecewise(secondaryTranslationalForward).put(2.5, primaryTranslationalForward));
+                c.strafeTranslational.set(Controller.piecewise(secondaryTranslationalLateral).put(2.5, primaryTranslationalLateral));
+
+                c.coast.set(Controller.proportionalFeedforward(0.01));
+                c.brake.set(Controller.proportionalFeedforward(0.01));
+
+                c.headingFeedback.set(Controller.proportional(1.0));
+                c.headingBrakeCoefficients.set(Vector2D.cartesian(0.1, 0.01));
+
+                c.linearBrakeCoefficients.set(Matrix.diag(0.1, 0.1));
+                c.quadraticBrakeCoefficients.set(Matrix.diag(0.001, 0.001));
+
+                c.maxAchievableForwardVelocity.set(60.0);
+                c.maxAchievableStrafeVelocity.set(45.0);
+                c.naturalForwardDeceleration.set(30.0);
+                c.naturalStrafeDeceleration.set(30.0);
+            }
+    );
     public static Follower create(HardwareMap h) {
-        // return new Follower(Drivetrain, Localizer, Foresight);
-        return null;
+        return new Follower(
+                new ThreeWheelIMULocalizer(h, localizerConfig),
+                new Mecanum(h, drivetrainConfig),
+                new Foresight(foresightConfig)
+        );
     }
 }

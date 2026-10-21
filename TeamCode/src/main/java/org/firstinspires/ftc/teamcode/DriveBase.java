@@ -55,7 +55,7 @@ public class DriveBase extends OpMode {
 
         double heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
-        double x = applyDeadzone(Math.pow(gamepad1.left_stick_x, 3));
+        double x = applyDeadzone(Math.pow(-gamepad1.left_stick_x, 3));
         double y = applyDeadzone(Math.pow(-gamepad1.left_stick_y, 3));
         double rx = applyDeadzone(Math.pow(gamepad1.right_stick_x, 3)) * TURN_SCALE;
 
